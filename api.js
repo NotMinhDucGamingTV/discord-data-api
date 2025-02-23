@@ -18,7 +18,7 @@ const DISCORD_BOT_TOKEN =
 
 app.use(express.static('public'));
 app.use(cors()); // Enable CORS
-
+app.get('/', async (req,res) => res.send("hi"))
 app.get('/api/user/:id', async (req, res) => {
   const userId = req.params.id;
 
