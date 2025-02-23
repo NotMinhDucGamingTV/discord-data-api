@@ -1,5 +1,14 @@
+const { Client, GatewayIntentBits } = require("discord.js");
 const express = require('express');
 const cors = require('cors');
+
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildPresences,  // Required to track presence
+    GatewayIntentBits.GuildMembers     // Required to fetch members
+  ]
+});
 
 const app = express();
 const PORT = 3000;
@@ -23,6 +32,21 @@ app.get('/api/user/:id', async (req, res) => {
 
     const extendedUserData = processUserData(userData);
     res.json(extendedUserData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+app.get('/api/user/:id/presence', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const guild = client.guilds.cache.first(); // Get the first available guild
+    if (!guild) return console.log("Bot is not in any guilds.");
+
+    await guild.members.fetch(); // Ensure we have member data
+    const user = await guild.members.fetch(userId);
+    res.send(user.presence.status)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -249,5 +273,6 @@ function getCreationDate(snowflake) {
 }
 
 app.listen(PORT, () => {
+  client.login(DISCORD_BOT_TOKEN);
   console.log(`Server is running on http://localhost:${PORT}`);
 });
