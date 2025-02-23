@@ -46,7 +46,8 @@ app.get('/api/user/:id/presence', async (req, res) => {
 
     await guild.members.fetch(); // Ensure we have member data
     const user = await guild.members.fetch(userId);
-    res.send(user.presence.status)
+    console.log(user.presence)
+    res.json(user.presence)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
